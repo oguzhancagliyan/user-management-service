@@ -1,0 +1,84 @@
+version: '3.2'
+services:
+  user.api:
+    image: ${DOCKER_REGISTRY-}user
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - elasticsearch
+    ports:
+      - "8080:8080"
+    networks:
+      - elk
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - xpack.monitoring.enabled=true
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    networks:
+      - elk
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.8.0
+    ports:
+      - "5085:5085/tcp"
+      - "5085:5085/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+      http.host: "0.0.0.0"
+      xpack.monitoring.elasticsearch.username: elastic
+      xpack.monitoring.elasticsearch.password: changeme
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.8.0
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.8.0
+    depends_on:
+      - elasticsearch
+      - kibana
+    links:
+      - logstash
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ../user-management-service/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ../logs/:/logs/
+    networks:
+      - elk
+  mongodb:
+    container_name: mongo
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data_container:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+    networks:
+      - elk
+
+
+volumes:
+  elasticsearch:
+  mongodb_data_container:
+
+networks:
+  elk:
+    driver: bridge

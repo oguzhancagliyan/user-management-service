@@ -1,0 +1,4 @@
+Database:
+  Connection_String: mongodb://user:1234@mongo:27017
+ElasticConfiguration:
+  Uri: http://elasticsearch:9200

@@ -1,0 +1,150 @@
+definitions:
+  models.AddUserModel:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  models.AddUserResponseModel:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.GetUserResponseModel:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.UpdateUserModel:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  models.UpdateUserResponseModel:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /users:
+    get:
+      description: retrieves the user
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GetUserResponseModel'
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: GetAllUser
+      tags:
+      - user
+    patch:
+      description: updates the user
+      parameters:
+      - description: UpdateUserModel
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserModel'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateUserResponseModel'
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: UpdateUser
+      tags:
+      - user
+    post:
+      description: Adds the user
+      parameters:
+      - description: AddUserModel
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddUserModel'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AddUserResponseModel'
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: AddUser
+      tags:
+      - user
+  /users/{id}:
+    delete:
+      description: deletes the user
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AddUserResponseModel'
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: DeleteUser
+      tags:
+      - user
+    get:
+      description: retrieves the user
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetUserResponseModel'
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: GetUser
+      tags:
+      - user
+swagger: "2.0"
